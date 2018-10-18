@@ -2,9 +2,9 @@
 /* eslint-disable  no-console */
 
 const Alexa = require('ask-sdk-core');
-const recipes = require('./recipes');
 const i18n = require('i18next');
 const sprintf = require('i18next-sprintf-postprocessor');
+const random = require('random');
 
 /* INTENT HANDLERS */
 const LaunchRequestHandler = {
@@ -15,7 +15,7 @@ const LaunchRequestHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    const item = requestAttributes.t(getRandomItem(Object.keys(recipes.RECIPE_EN_US)));
+    
 
     const speakOutput = requestAttributes.t('WELCOME_MESSAGE', requestAttributes.t('SKILL_NAME'), item);
     const repromptOutput = requestAttributes.t('WELCOME_REPROMPT');
@@ -29,54 +29,48 @@ const LaunchRequestHandler = {
   },
 };
 
+const getRandomTriple = () => random.int(0,255);
+
+const getRandomColour = () => {
+  const rgb = ['red', 'green', 'blue'].reduce( (map, key) => {
+		map[key] = getRandomTriple();
+		return map;
+	}, {});
+}
+
 const RecipeHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'RecipeIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'RandomColourIntent';
   },
   handle(handlerInput) {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    const itemSlot = handlerInput.requestEnvelope.request.intent.slots.Item;
-    let itemName;
-    if (itemSlot && itemSlot.value) {
-      itemName = itemSlot.value.toLowerCase();
-    }
+    const colour = getRandomColour();
 
-    const cardTitle = requestAttributes.t('DISPLAY_CARD_TITLE', requestAttributes.t('SKILL_NAME'), itemName);
-    const myRecipes = requestAttributes.t('RECIPES');
-    const recipe = myRecipes[itemName];
+    const cardTitle = requestAttributes.t('DISPLAY_CARD_TITLE', requestAttributes.t('SKILL_NAME'), 'Random Color');
     let speakOutput = "";
 
-    if (recipe) {
-      sessionAttributes.speakOutput = recipe;
+    if (colour) {
+      sessionAttributes.speakOutput = requestAttributes.t('RECIPE_NOT_FOUND_MESSAGE', ...colour);
       //sessionAttributes.repromptSpeech = requestAttributes.t('RECIPE_REPEAT_MESSAGE');
       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
       return handlerInput.responseBuilder
         .speak(sessionAttributes.speakOutput) // .reprompt(sessionAttributes.repromptSpeech)
-        .withSimpleCard(cardTitle, recipe)
+        .withSimpleCard(cardTitle, `${colour.red}, ${colour.green}, ${colour.blue}`)
         .getResponse();
     }
     else{
-      speakOutput = requestAttributes.t('RECIPE_NOT_FOUND_MESSAGE');
-      const repromptSpeech = requestAttributes.t('RECIPE_NOT_FOUND_REPROMPT');
-      if (itemName) {
-        speakOutput += requestAttributes.t('RECIPE_NOT_FOUND_WITH_ITEM_NAME', itemName);
-      } else {
-        speakOutput += requestAttributes.t('RECIPE_NOT_FOUND_WITHOUT_ITEM_NAME');
-      }
-      speakOutput += repromptSpeech;
+      speakOutput = requestAttributes.t('FAILURE_MESSAGE');
 
       sessionAttributes.speakOutput = speakOutput; //saving speakOutput to attributes, so we can use it to repeat
-      sessionAttributes.repromptSpeech = repromptSpeech;
 
       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
       return handlerInput.responseBuilder
         .speak(sessionAttributes.speakOutput)
-        .reprompt(sessionAttributes.repromptSpeech)
         .getResponse();
     }
   }
@@ -165,37 +159,30 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 const languageStrings = {
   en: {
     translation: {
-      RECIPES: recipes.RECIPE_EN_US,
-      SKILL_NAME: 'Minecraft Helper',
-      WELCOME_MESSAGE: 'Welcome to %s. You can ask a question like, what\'s the recipe for a %s? ... Now, what can I help you with?',
+      SKILL_NAME: 'Colour Book',
+      WELCOME_MESSAGE: 'Welcome to %s. You can get a colour by saying, fetch me a random colour ... Now, what can I help you with?',
       WELCOME_REPROMPT: 'For instructions on what you can say, please say help me.',
-      DISPLAY_CARD_TITLE: '%s  - Recipe for %s.',
-      HELP_MESSAGE: 'You can ask questions such as, what\'s the recipe for a %s, or, you can say exit...Now, what can I help you with?',
-      HELP_REPROMPT: 'You can say things like, what\'s the recipe for a %s, or you can say exit...Now, what can I help you with?',
+      DISPLAY_CARD_TITLE: '%s  - Random Colour.',
+      HELP_MESSAGE: 'You can make requests such as, fetch a random colour, or, you can say exit...Now, what can I help you with?',
+      HELP_REPROMPT: 'You can say things like, random colour, or you can say exit...Now, what can I help you with?',
       STOP_MESSAGE: 'Goodbye!',
       RECIPE_REPEAT_MESSAGE: 'Try saying repeat.',
-      RECIPE_NOT_FOUND_MESSAGE: 'I\'m sorry, I currently do not know ',
-      RECIPE_NOT_FOUND_WITH_ITEM_NAME: 'the recipe for %s. ',
-      RECIPE_NOT_FOUND_WITHOUT_ITEM_NAME: 'that recipe. ',
-      RECIPE_NOT_FOUND_REPROMPT: 'What else can I help with?'
+      FAILURE_MESSAGE: 'I\'m sorry, my muse has left me, please ask again later ',
+      COLOUR: 'How about Red <say-as interpret-as="digits">%s</say-as>, Green <say-as interpret-as="digits">%s</say-as>, and <prosody rate="x-slow">Blue</prosody><break /><say-as interpret-as="digits">%s</say-as>?''
     },
   },
   'en-US': {
     translation: {
-      RECIPES: recipes.RECIPE_EN_US,
-      SKILL_NAME: 'American Minecraft Helper'
-    },
-  },
-  'en-GB': {
-    translation: {
-      RECIPES: recipes.RECIPE_EN_GB,
-      SKILL_NAME: 'British Minecraft Helper'
+      SKILL_NAME: 'Color Book',
+      WELCOME_MESSAGE: 'Welcome to %s. You can get a color by saying, fetch me a random color ... Now, what can I help you with?',
+      DISPLAY_CARD_TITLE: '%s  - Random Color.',
+      HELP_MESSAGE: 'You can make requests such as, fetch a random color, or, you can say exit...Now, what can I help you with?',
+      HELP_REPROMPT: 'You can say things like, random color, or you can say exit...Now, what can I help you with?'
     },
   },
   de: {
     translation: {
-      RECIPES: recipes.RECIPE_DE_DE,
-      SKILL_NAME: 'Assistent für Minecraft in Deutsch',
+      SKILL_NAME: 'Farbbuch',
       WELCOME_MESSAGE: 'Willkommen bei %s. Du kannst beispielsweise die Frage stellen: Welche Rezepte gibt es für eine %s? ... Nun, womit kann ich dir helfen?',
       WELCOME_REPROMPT: 'Wenn du wissen möchtest, was du sagen kannst, sag einfach „Hilf mir“.',
       DISPLAY_CARD_TITLE: '%s - Rezept für %s.',
