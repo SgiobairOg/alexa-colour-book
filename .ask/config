@@ -2,13 +2,13 @@
   "deploy_settings": {
     "default": {
       "skill_id": "",
-      "was_cloned": false,
+      "was_cloned": true,
       "merge": {
         "skillManifest": {
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "ask-custom-how-to-default"
+                "uri": "wilsonsio-alexa-colour-book"
               }
             }
           }
