@@ -15,9 +15,7 @@ const LaunchRequestHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    
-
-    const speakOutput = requestAttributes.t('WELCOME_MESSAGE', requestAttributes.t('SKILL_NAME'), item);
+    const speakOutput = requestAttributes.t('WELCOME_MESSAGE', requestAttributes.t('SKILL_NAME'));
     const repromptOutput = requestAttributes.t('WELCOME_REPROMPT');
 
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -35,38 +33,109 @@ const getRandomColour = () => {
   const rgb = ['red', 'green', 'blue'].reduce( (map, key) => {
 		map[key] = getRandomTriple();
 		return map;
-	}, {});
-}
+  }, {});
+  return rgb;
+};
 
-const RecipeHandler = {
+const RandomColourHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'RandomColourIntent';
   },
   handle(handlerInput) {
+    console.log('Random Colour Invoked...');
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     const colour = getRandomColour();
+    console.log('Colour: ', colour);
 
     const cardTitle = requestAttributes.t('DISPLAY_CARD_TITLE', requestAttributes.t('SKILL_NAME'), 'Random Color');
+    console.log('Card Title: ', cardTitle);
     let speakOutput = "";
 
     if (colour) {
-      sessionAttributes.speakOutput = requestAttributes.t('RECIPE_NOT_FOUND_MESSAGE', ...colour);
+      sessionAttributes.speakOutput = requestAttributes.t('COLOUR_MESSAGE', colour.red, colour.green, colour.blue);
       //sessionAttributes.repromptSpeech = requestAttributes.t('RECIPE_REPEAT_MESSAGE');
       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-      return handlerInput.responseBuilder
+      const primaryText = requestAttributes.t('COLOUR_TEXT_MESSAGE', colour.red, colour.green, colour.blue);
+      console.log('Primary:', primaryText);
+      const secondaryText = requestAttributes.t('COLOUR_TEXT_SECONDARY_MESSAGE');
+      //const image = require('./assets/colour.jpg');
+      /*const template = {
+        "type": "Display.RenderTemplate",
+        "template": {
+          "type":"BodyTemplate1",
+          "token": "string",
+          "backButton": "HIDDEN",
+          "backgroundImage": {
+            "contentDescription": "Textured grey background",
+            "sources": [
+              {
+                "url": "https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+              }
+            ],
+            "title": "My Favorite Car",
+            "image": {
+              "contentDescription": "My favorite car",
+              "sources": [
+                {
+                  "url": "https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                }
+              ]
+            },
+            "textContent": {
+              "primaryText": {
+                "text": primaryText,
+                "type": "PlainText"
+              },
+              "secondaryText": {
+                "text": secondaryText,
+                "type": "PlainText"
+              },
+              "tertiaryText": {
+                "text": "By me!",
+                "type": "PlainText"
+              }
+            }
+          },
+          "title": cardTitle
+        }
+      };*/
+      const template = {
+        "type": "BodyTemplate1",
+        "token": "color",
+        "title": cardTitle,
+        "textContent": {
+          "primaryText": {
+            "type": "PlainText",
+            "text": primaryText
+          }
+        },
+        "backButton": "HIDDEN"
+      };
+      console.log('Template: ', template);
+
+      const response = handlerInput.responseBuilder;
+
+      console.log('Response: ', response);
+
+      response
         .speak(sessionAttributes.speakOutput) // .reprompt(sessionAttributes.repromptSpeech)
-        .withSimpleCard(cardTitle, `${colour.red}, ${colour.green}, ${colour.blue}`)
-        .getResponse();
+        .withSimpleCard(cardTitle, `${colour.red}, ${colour.green}, ${colour.blue}`);
+        //.addRenderTemplateDirective(template);
+      
+      console.log('Response: ', response.getResponse());
+
+      return response.getResponse();
     }
     else{
+      console.log('Failure...');
       speakOutput = requestAttributes.t('FAILURE_MESSAGE');
-
+      console.log('Failure speech output: ', speakOutput)
       sessionAttributes.speakOutput = speakOutput; //saving speakOutput to attributes, so we can use it to repeat
-
+      console.log('Failure speech output attribute: ', sessionAttributes.speakOutput);
       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
       return handlerInput.responseBuilder
@@ -75,6 +144,9 @@ const RecipeHandler = {
     }
   }
 };
+
+const PreviousIntentHandler = RandomColourHandler;
+
 
 const HelpHandler = {
   canHandle(handlerInput) {
@@ -85,10 +157,8 @@ const HelpHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    const item = requestAttributes.t(getRandomItem(Object.keys(recipes.RECIPE_EN_US)));
-
-    sessionAttributes.speakOutput = requestAttributes.t('HELP_MESSAGE', item);
-    sessionAttributes.repromptSpeech = requestAttributes.t('HELP_REPROMPT', item);
+    sessionAttributes.speakOutput = requestAttributes.t('HELP_MESSAGE');
+    sessionAttributes.repromptSpeech = requestAttributes.t('HELP_REPROMPT');
 
     return handlerInput.responseBuilder
       .speak(sessionAttributes.speakOutput)
@@ -166,9 +236,11 @@ const languageStrings = {
       HELP_MESSAGE: 'You can make requests such as, fetch a random colour, or, you can say exit...Now, what can I help you with?',
       HELP_REPROMPT: 'You can say things like, random colour, or you can say exit...Now, what can I help you with?',
       STOP_MESSAGE: 'Goodbye!',
-      RECIPE_REPEAT_MESSAGE: 'Try saying repeat.',
+      COLOUR_REPEAT_MESSAGE: 'Try saying repeat.',
       FAILURE_MESSAGE: 'I\'m sorry, my muse has left me, please ask again later ',
-      COLOUR: 'How about Red <say-as interpret-as="digits">%s</say-as>, Green <say-as interpret-as="digits">%s</say-as>, and <prosody rate="x-slow">Blue</prosody><break /><say-as interpret-as="digits">%s</say-as>?''
+      COLOUR_MESSAGE: 'How about <say-as interpret-as="spell-out">RGB</say-as> <say-as interpret-as="digits">%s</say-as>, <say-as interpret-as="digits">%s</say-as>, <prosody rate="x-slow"><say-as interpret-as="digits">%s</say-as></prosody>?',
+      COLOUR_TEXT_MESSAGE: 'How about RGB %s, %s, %s?',
+      COLOUR_TEXT_SECONDARY_MESSAGE: 'That looks good, right?',
     },
   },
   'en-US': {
@@ -189,11 +261,7 @@ const languageStrings = {
       HELP_MESSAGE: 'Du kannst beispielsweise Fragen stellen wie „Wie geht das Rezept für eine %s“ oder du kannst „Beenden“ sagen ... Wie kann ich dir helfen?',
       HELP_REPROMPT: 'Du kannst beispielsweise Sachen sagen wie „Wie geht das Rezept für eine %s“ oder du kannst „Beenden“ sagen ... Wie kann ich dir helfen?',
       STOP_MESSAGE: 'Auf Wiedersehen!',
-      RECIPE_REPEAT_MESSAGE: 'Sage einfach „Wiederholen“.',
-      RECIPE_NOT_FOUND_MESSAGE: 'Tut mir leid, ich kenne derzeit ',
-      RECIPE_NOT_FOUND_WITH_ITEM_NAME: 'das Rezept für %s nicht. ',
-      RECIPE_NOT_FOUND_WITHOUT_ITEM_NAME: 'dieses Rezept nicht. ',
-      RECIPE_NOT_FOUND_REPROMPT: 'Womit kann ich dir sonst helfen?'
+      RECIPE_REPEAT_MESSAGE: 'Sage einfach „Wiederholen“.'
     },
   },
 };
@@ -215,22 +283,15 @@ const LocalizationInterceptor = {
   },
 };
 
-// getRandomItem
-function getRandomItem(arrayOfItems) {
-  // the argument is an array [] of words or phrases
-  let i = 0;
-  i = Math.floor(Math.random() * arrayOfItems.length);
-  return (arrayOfItems[i]);
-};
-
 /* LAMBDA SETUP */
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
-    RecipeHandler,
+    RandomColourHandler,
     HelpHandler,
     RepeatHandler,
     ExitHandler,
+    PreviousIntentHandler,
     SessionEndedRequestHandler
   )
   .addRequestInterceptors(LocalizationInterceptor)
