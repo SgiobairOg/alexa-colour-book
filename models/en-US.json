@@ -26,6 +26,39 @@
         },
         {
           "name": "AMAZON.CancelIntent"
+        },
+        {
+          "name": "AMAZON.PreviousIntent"
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent"
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent"
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent"
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent"
+        },
+        {
+          "name": "AMAZON.NextIntent"
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent"
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent"
+        },
+        {
+          "name": "AMAZON.MoreIntent"
+        },
+        {
+          "name": "AMAZON.PageDownIntent"
+        },
+        {
+          "name": "AMAZON.PageUpIntent"
         }
       ]
     }

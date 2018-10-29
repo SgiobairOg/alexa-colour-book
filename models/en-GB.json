@@ -8,7 +8,7 @@
           "slots": [
           ],
           "samples": [
-            "fetch a random colour",
+            "fetch me a random colour",
             "I need a colour",
             "what colour should I use",
             "give me a colour",
@@ -27,6 +27,39 @@
         },
         {
           "name": "AMAZON.CancelIntent"
+        },
+        {
+          "name": "AMAZON.PreviousIntent"
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent"
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent"
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent"
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent"
+        },
+        {
+          "name": "AMAZON.NextIntent"
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent"
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent"
+        },
+        {
+          "name": "AMAZON.MoreIntent"
+        },
+        {
+          "name": "AMAZON.PageDownIntent"
+        },
+        {
+          "name": "AMAZON.PageUpIntent"
         }
       ]
     }
