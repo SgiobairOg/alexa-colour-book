@@ -1,10 +1,10 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "",
-      "was_cloned": true,
+      "skill_id": "amzn1.ask.skill.7e1b2445-a77b-44c0-9041-3297b0d15c0e",
+      "was_cloned": false,
       "merge": {
-        "skillManifest": {
+        "manifest": {
           "apis": {
             "custom": {
               "endpoint": {
@@ -13,6 +13,33 @@
             }
           }
         }
+      },
+      "resources": {
+        "manifest": {
+          "eTag": "15ac8993ba2aab6da3a5b8bca81377e3"
+        },
+        "interactionModel": {
+          "de-DE": {
+            "eTag": "da4e462836e09c271e351d9199a512f4"
+          },
+          "en-US": {
+            "eTag": "0abaf9d42704dddd5f06518b2dcca081"
+          },
+          "en-GB": {
+            "eTag": "01dc93da3438b43abeb4a3c2404e554a"
+          }
+        },
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:592502667129:function:wilsonsio-alexa-colour-book",
+            "functionName": "arn:aws:lambda:us-east-1:592502667129:function:wilsonsio-alexa-colour-book",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "cc14ac4a-ab61-486a-afad-6a5515354d3e"
+          }
+        ]
       }
     }
   }
