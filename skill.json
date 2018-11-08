@@ -3,29 +3,30 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Spend some time coming up with an interesting, succinct description.",
+          "summary": "A simple utility to generate a random RGB color when you need inspiration.",
           "examplePhrases": [
-            "Alexa open Minecraft Helper",
-            "Alexa ask Minecraft Helper what's the recipe for a chest",
-            "Alexa ask Minecraft Helper how do I get a map"
+            "Alexa open Color Book",
+            "Alexa ask Color Book fetch a random color",
+            "Alexa tell Color Book I need a color"
           ],
           "keywords": [
-            "Minecraft",
-            "game"
+            "color",
+            "utility"
           ],
-          "name": "Minecraft Helper",
-          "description": "Sample Full Description"
+          "name": "Colour Book",
+          "description": "A simple utility to generate a random RGB color when you need inspiration."
         },
         "de-DE": {
-          "name": "Assistent für Minecraft in Deutsch"
+          "name": "Farbe Buch",
+          "summary": "A simple utility to generate a random RGB color when you need inspiration."
         },
         "en-GB": {
-          "name": "British Minecraft Helper"
+          "name": "Colour Book"
         }
       },
       "isAvailableWorldwide": true,
       "testingInstructions": "Sample Testing Instructions.",
-      "category": "EDUCATION_AND_REFERENCE",
+      "category": "UTILITY",
       "distributionCountries": []
     },
     "apis": {
